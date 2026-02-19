@@ -37,4 +37,8 @@ public class PaymentSettings {
         );
     }
 
+    void assignGatewayCode(String gatewayCode) {
+        this.gatewayCode = gatewayCode;
+    }
+
 }
