@@ -1,11 +1,14 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
+import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -28,7 +31,12 @@ public class PaymentSettings {
         this.method = method;
     }
 
-    public static PaymentSettings brandNew(PaymentMethod method, UUID creditCardId) {
+    static PaymentSettings brandNew(PaymentMethod method, UUID creditCardId) {
+        Objects.requireNonNull(method);
+        if (method.equals(PaymentMethod.CREDIT_CARD)) {
+            Objects.requireNonNull(creditCardId);
+        }
+
         return new PaymentSettings(
             IdGenerator.generateTimeBasedUUID(),
             creditCardId,
@@ -38,6 +46,14 @@ public class PaymentSettings {
     }
 
     void assignGatewayCode(String gatewayCode) {
+        if (StringUtils.isBlank(gatewayCode)) {
+            throw new IllegalArgumentException("Gateway code cannot be blank");
+        }
+
+        if (this.getGatewayCode() != null) {
+            throw new DomainException("Gateway code already assigned");
+        }
+
         this.gatewayCode = gatewayCode;
     }
 
