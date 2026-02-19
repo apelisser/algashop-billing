@@ -1,6 +1,7 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Builder
 public class Payer {
 
     private String fullName;

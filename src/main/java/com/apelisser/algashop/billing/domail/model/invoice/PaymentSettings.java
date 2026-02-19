@@ -1,5 +1,6 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
+import com.apelisser.algashop.billing.domail.model.IdGenerator;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,6 +19,22 @@ public class PaymentSettings {
     private PaymentMethod method;
 
     protected PaymentSettings() {
+    }
+
+    protected PaymentSettings(UUID id, UUID creditCardId, String gatewayCode, PaymentMethod method) {
+        this.id = id;
+        this.creditCardId = creditCardId;
+        this.gatewayCode = gatewayCode;
+        this.method = method;
+    }
+
+    public static PaymentSettings brandNew(PaymentMethod method, UUID creditCardId) {
+        return new PaymentSettings(
+            IdGenerator.generateTimeBasedUUID(),
+            creditCardId,
+            null,
+            method
+        );
     }
 
 }
