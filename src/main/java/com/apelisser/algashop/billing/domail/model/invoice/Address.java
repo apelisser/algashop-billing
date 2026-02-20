@@ -1,5 +1,6 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
+import com.apelisser.algashop.billing.domail.model.FieldValidations;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -9,7 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode
-@Builder
 public class Address {
 
     private String street;
@@ -23,7 +23,15 @@ public class Address {
     protected Address() {
     }
 
+    @Builder
     public Address(String street, String number, String complement, String neighborhood, String city, String state, String zipCode) {
+        FieldValidations.requiresNonBlank(street);
+        FieldValidations.requiresNonBlank(number);
+        FieldValidations.requiresNonBlank(neighborhood);
+        FieldValidations.requiresNonBlank(city);
+        FieldValidations.requiresNonBlank(state);
+        FieldValidations.requiresNonBlank(zipCode);
+
         this.street = street;
         this.number = number;
         this.complement = complement;
