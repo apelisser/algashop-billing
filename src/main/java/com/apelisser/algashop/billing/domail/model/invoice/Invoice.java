@@ -95,7 +95,7 @@ public class Invoice {
     }
 
     public boolean isCanceled() {
-        return InvoiceStatus.CANCELLED.equals(this.getStatus());
+        return InvoiceStatus.CANCELED.equals(this.getStatus());
     }
 
     public boolean isUnpaid() {
@@ -123,7 +123,7 @@ public class Invoice {
 
         setCancelReason(cancelReason);
         setCancelledAt(OffsetDateTime.now());
-        setStatus(InvoiceStatus.CANCELLED);
+        setStatus(InvoiceStatus.CANCELED);
     }
 
     public void assignPaymentGatewayCode(String code) {
