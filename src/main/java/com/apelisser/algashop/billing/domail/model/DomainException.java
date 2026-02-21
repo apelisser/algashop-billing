@@ -7,6 +7,9 @@ public class DomainException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = -3801043806351938155L;
 
+    public DomainException() {
+    }
+
     public DomainException(String message) {
         super(message);
     }

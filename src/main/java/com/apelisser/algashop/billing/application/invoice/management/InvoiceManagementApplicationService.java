@@ -1,0 +1,100 @@
+package com.apelisser.algashop.billing.application.invoice.management;
+
+import com.apelisser.algashop.billing.domail.model.creditcard.CreditCardNotFoundException;
+import com.apelisser.algashop.billing.domail.model.creditcard.CreditCardRepository;
+import com.apelisser.algashop.billing.domail.model.invoice.Address;
+import com.apelisser.algashop.billing.domail.model.invoice.Invoice;
+import com.apelisser.algashop.billing.domail.model.invoice.InvoiceRepository;
+import com.apelisser.algashop.billing.domail.model.invoice.InvoicingService;
+import com.apelisser.algashop.billing.domail.model.invoice.LineItem;
+import com.apelisser.algashop.billing.domail.model.invoice.Payer;
+import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentGatewayService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
+
+@Service
+public class InvoiceManagementApplicationService {
+
+    private static Logger log = LoggerFactory.getLogger(InvoiceManagementApplicationService.class);
+
+    private final PaymentGatewayService paymentGatewayService;
+    private final InvoicingService invoicingService;
+    private final InvoiceRepository invoiceRepository;
+    private final CreditCardRepository creditCardRepository;
+
+    public InvoiceManagementApplicationService(PaymentGatewayService paymentGatewayService,
+            InvoicingService invoicingService, InvoiceRepository invoiceRepository,
+            CreditCardRepository creditCardRepository) {
+        this.paymentGatewayService = paymentGatewayService;
+        this.invoicingService = invoicingService;
+        this.invoiceRepository = invoiceRepository;
+        this.creditCardRepository = creditCardRepository;
+    }
+
+    @Transactional
+    public UUID generate(GenerateInvoiceInput input) {
+        PaymentSettingsInput paymentSettings = input.getPaymentSettings();
+
+        verifyCreditCardId(paymentSettings.getCreditCardId());
+
+        Payer payer = convertToPayer(input.getPayer());
+        Set<LineItem> items = convertToLineItem(input.getItems());
+
+        Invoice invoice = invoicingService.issue(input.getOrderId(), input.getCustomerId(), payer, items);
+        invoice.changePaymentSettings(paymentSettings.getMethod(), paymentSettings.getCreditCardId());
+
+        invoiceRepository.saveAndFlush(invoice);
+
+        return invoice.getId();
+    }
+
+    private Set<LineItem> convertToLineItem(Set<LineItemInput> itemsInput) {
+        Set<LineItem> lineItems = new LinkedHashSet<>();
+
+        int itemNumber = 1;
+        for (LineItemInput itemInput : itemsInput) {
+            lineItems.add(LineItem.builder()
+                .number(itemNumber)
+                .name(itemInput.getName())
+                .amount(itemInput.getAmount())
+                .build()
+            );
+            itemNumber++;
+        }
+
+        return lineItems;
+    }
+
+    private Payer convertToPayer(PayerData payerData) {
+        AddressData addressData = payerData.getAddress();
+
+        return Payer.builder()
+            .fullName(payerData.getFullName())
+            .document(payerData.getDocument())
+            .phone(payerData.getPhone())
+            .email(payerData.getEmail())
+            .address(Address.builder()
+                .street(addressData.getStreet())
+                .number(addressData.getNumber())
+                .complement(addressData.getComplement())
+                .neighborhood(addressData.getNeighborhood())
+                .city(addressData.getCity())
+                .state(addressData.getState())
+                .zipCode(addressData.getZipCode())
+                .build())
+            .build();
+    }
+
+    private void verifyCreditCardId(UUID creditCardId) {
+        if (creditCardId != null && !creditCardRepository.existsById(creditCardId)) {
+            throw new CreditCardNotFoundException();
+        }
+    }
+
+}
