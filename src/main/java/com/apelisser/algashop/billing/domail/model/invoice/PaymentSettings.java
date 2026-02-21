@@ -2,8 +2,10 @@ package com.apelisser.algashop.billing.domail.model.invoice;
 
 import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -17,8 +19,10 @@ import java.util.UUID;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "id")
+@Entity
 public class PaymentSettings {
 
+    @Id
     private UUID id;
     private UUID creditCardId;
     private String gatewayCode;
