@@ -1,6 +1,7 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
 import com.apelisser.algashop.billing.domail.model.FieldValidations;
+import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -13,6 +14,7 @@ import java.util.Objects;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Embeddable
 public class LineItem {
 
     private Integer number;

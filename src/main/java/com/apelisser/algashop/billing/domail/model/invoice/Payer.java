@@ -1,6 +1,8 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
 import com.apelisser.algashop.billing.domail.model.FieldValidations;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -12,12 +14,15 @@ import java.util.Objects;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Embeddable
 public class Payer {
 
     private String fullName;
     private String document;
     private String phone;
     private String email;
+
+    @Embedded
     private Address address;
 
     protected Payer() {

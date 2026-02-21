@@ -1,6 +1,7 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
 import com.apelisser.algashop.billing.domail.model.FieldValidations;
+import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Embeddable
 public class Address {
 
     private String street;

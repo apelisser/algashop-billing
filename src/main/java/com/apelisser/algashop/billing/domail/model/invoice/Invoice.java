@@ -2,13 +2,7 @@ package com.apelisser.algashop.billing.domail.model.invoice;
 
 import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -44,8 +38,12 @@ public class Invoice {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private PaymentSettings paymentSettings;
+
+    @ElementCollection
+    @CollectionTable(name = "invoice_line_items", joinColumns = @JoinColumn(name = "invoice_id"))
     private Set<LineItem> items = new HashSet<>();
 
+    @Embedded
     private Payer payer;
     private String cancelReason;
 
