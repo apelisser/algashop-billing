@@ -2,6 +2,9 @@ package com.apelisser.algashop.billing.domail.model.invoice;
 
 import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,12 +22,19 @@ public class PaymentSettings {
     private UUID id;
     private UUID creditCardId;
     private String gatewayCode;
+
+    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
+
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PACKAGE)
+    @OneToOne(mappedBy = "paymentSettings")
+    private Invoice invoice;
 
     protected PaymentSettings() {
     }
 
-    protected PaymentSettings(UUID id, UUID creditCardId, String gatewayCode, PaymentMethod method) {
+    protected PaymentSettings(UUID id, UUID creditCardId, String gatewayCode, PaymentMethod method, Invoice invoice) {
         this.id = id;
         this.creditCardId = creditCardId;
         this.gatewayCode = gatewayCode;
@@ -41,7 +51,8 @@ public class PaymentSettings {
             IdGenerator.generateTimeBasedUUID(),
             creditCardId,
             null,
-            method
+            method,
+            null
         );
     }
 

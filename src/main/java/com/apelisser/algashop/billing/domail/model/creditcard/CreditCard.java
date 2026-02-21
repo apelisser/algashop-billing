@@ -1,6 +1,8 @@
 package com.apelisser.algashop.billing.domail.model.creditcard;
 
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,8 +16,10 @@ import java.util.UUID;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "id")
+@Entity
 public class CreditCard {
 
+    @Id
     private UUID id;
     private OffsetDateTime createdAt;
     private UUID customerId;

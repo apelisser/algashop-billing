@@ -2,6 +2,13 @@ package com.apelisser.algashop.billing.domail.model.invoice;
 
 import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,8 +26,10 @@ import java.util.UUID;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "id")
+@Entity
 public class Invoice {
 
+    @Id
     private UUID id;
     private String orderId;
     private UUID customerId;
@@ -29,9 +38,14 @@ public class Invoice {
     private OffsetDateTime cancelledAt;
     private OffsetDateTime expiredAt;
     private BigDecimal totalAmount;
+
+    @Enumerated(EnumType.STRING)
     private InvoiceStatus status;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private PaymentSettings paymentSettings;
     private Set<LineItem> items = new HashSet<>();
+
     private Payer payer;
     private String cancelReason;
 
@@ -146,6 +160,7 @@ public class Invoice {
         }
 
         PaymentSettings paymentSettings = PaymentSettings.brandNew(method, creditCardId);
+        paymentSettings.setInvoice(this);
         this.setPaymentSettings(paymentSettings);
     }
 
