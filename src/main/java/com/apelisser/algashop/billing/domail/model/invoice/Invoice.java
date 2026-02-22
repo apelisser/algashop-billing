@@ -1,6 +1,6 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
-import com.apelisser.algashop.billing.domail.model.AbstractAuditableEntity;
+import com.apelisser.algashop.billing.domail.model.AbstractAuditableAggregateRoot;
 import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
 import jakarta.persistence.*;
@@ -22,7 +22,7 @@ import java.util.UUID;
 @Setter(AccessLevel.PRIVATE)
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Entity
-public class Invoice extends AbstractAuditableEntity {
+public class Invoice extends AbstractAuditableAggregateRoot<Invoice> {
 
     @Id
     private UUID id;
@@ -86,7 +86,7 @@ public class Invoice extends AbstractAuditableEntity {
             .map(LineItem::getAmount)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new Invoice(
+        Invoice invoice = new Invoice(
             IdGenerator.generateTimeBasedUUID(),
             orderId,
             customerId,
@@ -101,6 +101,15 @@ public class Invoice extends AbstractAuditableEntity {
             payer,
             null
         );
+
+        invoice.registerEvent(new InvoiceIssuedEvent(
+            invoice.getId(),
+            invoice.getCustomerId(),
+            invoice.getOrderId(),
+            invoice.getIssuedAt())
+        );
+
+        return invoice;
     }
 
     public Set<LineItem> getItems() {
@@ -127,6 +136,13 @@ public class Invoice extends AbstractAuditableEntity {
 
         setPaidAt(OffsetDateTime.now());
         setStatus(InvoiceStatus.PAID);
+
+        registerEvent(new InvoicePaidEvent(
+            this.getId(),
+            this.getCustomerId(),
+            this.getOrderId(),
+            this.getPaidAt())
+        );
     }
 
     public void cancel(String cancelReason) {
@@ -137,6 +153,13 @@ public class Invoice extends AbstractAuditableEntity {
         setCancelReason(cancelReason);
         setCancelledAt(OffsetDateTime.now());
         setStatus(InvoiceStatus.CANCELED);
+
+        registerEvent(new InvoiceCanceledEvent(
+            this.getId(),
+            this.getCustomerId(),
+            this.getOrderId(),
+            this.getCancelledAt())
+        );
     }
 
     public void assignPaymentGatewayCode(String code) {
