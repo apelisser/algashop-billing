@@ -117,4 +117,20 @@ class InvoiceTest {
             .isThrownBy(() -> invoice.cancel("Customer requested"));
     }
 
+    @Test
+    void givenPaidInvoice_whenChangePaymentSettings_shouldThrowIDomainException() {
+        Invoice invoice = InvoiceTestDataBuilder.anInvoice().status(InvoiceStatus.PAID).build();
+
+        Assertions.assertThatExceptionOfType(DomainException.class)
+            .isThrownBy(() -> invoice.changePaymentSettings(PaymentMethod.GATEWAY_BALANCE, null));
+    }
+
+    @Test
+    void givenPaidInvoice_whenAssignGatewayCode_shouldThrowIDomainException() {
+        Invoice invoice = InvoiceTestDataBuilder.anInvoice().status(InvoiceStatus.PAID).build();
+
+        Assertions.assertThatExceptionOfType(DomainException.class)
+            .isThrownBy(() -> invoice.assignPaymentGatewayCode("123456"));
+    }
+
 }
