@@ -1,5 +1,6 @@
 package com.apelisser.algashop.billing.domail.model.invoice;
 
+import com.apelisser.algashop.billing.domail.model.AbstractAuditableEntity;
 import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
 import jakarta.persistence.*;
@@ -19,9 +20,9 @@ import java.util.UUID;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Entity
-public class Invoice {
+public class Invoice extends AbstractAuditableEntity {
 
     @Id
     private UUID id;
