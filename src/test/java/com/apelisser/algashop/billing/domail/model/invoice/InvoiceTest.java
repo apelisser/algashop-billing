@@ -58,7 +58,7 @@ class InvoiceTest {
         invoice.cancel("Customer requested");
 
         Assertions.assertThat(invoice.isCanceled()).isTrue();
-        Assertions.assertThat(invoice.getCancelledAt()).isNotNull();
+        Assertions.assertThat(invoice.getCanceledAt()).isNotNull();
         Assertions.assertThat(invoice.getCancelReason()).isEqualTo("Customer requested");
     }
 

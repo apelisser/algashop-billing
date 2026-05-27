@@ -30,8 +30,8 @@ public class Invoice extends AbstractAuditableAggregateRoot<Invoice> {
     private UUID customerId;
     private OffsetDateTime issuedAt;
     private OffsetDateTime paidAt;
-    private OffsetDateTime cancelledAt;
-    private OffsetDateTime expiredAt;
+    private OffsetDateTime canceledAt;
+    private OffsetDateTime expiresAt;
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
@@ -41,7 +41,7 @@ public class Invoice extends AbstractAuditableAggregateRoot<Invoice> {
     private PaymentSettings paymentSettings;
 
     @ElementCollection
-    @CollectionTable(name = "invoice_line_items", joinColumns = @JoinColumn(name = "invoice_id"))
+    @CollectionTable(name = "invoice_line_item", joinColumns = @JoinColumn(name = "invoice_id"))
     private Set<LineItem> items = new HashSet<>();
 
     @Embedded
@@ -52,15 +52,15 @@ public class Invoice extends AbstractAuditableAggregateRoot<Invoice> {
     }
 
     protected Invoice(UUID id, String orderId, UUID customerId, OffsetDateTime issuedAt, OffsetDateTime paidAt,
-            OffsetDateTime cancelledAt, OffsetDateTime expiredAt, BigDecimal totalAmount, InvoiceStatus status,
+            OffsetDateTime canceledAt, OffsetDateTime expiresAt, BigDecimal totalAmount, InvoiceStatus status,
             PaymentSettings paymentSettings, Set<LineItem> items, Payer payer, String cancelReason) {
         this.id = id;
         this.orderId = orderId;
         this.customerId = customerId;
         this.issuedAt = issuedAt;
         this.paidAt = paidAt;
-        this.cancelledAt = cancelledAt;
-        this.expiredAt = expiredAt;
+        this.canceledAt = canceledAt;
+        this.expiresAt = expiresAt;
         this.totalAmount = totalAmount;
         this.status = status;
         this.paymentSettings = paymentSettings;
@@ -151,14 +151,14 @@ public class Invoice extends AbstractAuditableAggregateRoot<Invoice> {
         }
 
         setCancelReason(cancelReason);
-        setCancelledAt(OffsetDateTime.now());
+        setCanceledAt(OffsetDateTime.now());
         setStatus(InvoiceStatus.CANCELED);
 
         registerEvent(new InvoiceCanceledEvent(
             this.getId(),
             this.getCustomerId(),
             this.getOrderId(),
-            this.getCancelledAt())
+            this.getCanceledAt())
         );
     }
 
