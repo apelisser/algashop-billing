@@ -4,6 +4,7 @@ import com.apelisser.algashop.billing.domail.model.creditcard.CreditCardProvider
 import com.apelisser.algashop.billing.domail.model.creditcard.LimitedCreditCard;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -32,7 +33,14 @@ public class CreditCardProviderServiceFastpayImpl implements CreditCardProviderS
 
     @Override
     public Optional<LimitedCreditCard> findById(String gatewayCode) {
-        FastpayCreditCardResponse response = fastpayCreditCardAPIClient.findById(gatewayCode);
+        FastpayCreditCardResponse response;
+
+        try {
+            response = fastpayCreditCardAPIClient.findById(gatewayCode);
+        } catch (HttpClientErrorException.NotFound e) {
+            return Optional.empty();
+        }
+
         return Optional.of(toLimitedCreditCard(response));
     }
 
