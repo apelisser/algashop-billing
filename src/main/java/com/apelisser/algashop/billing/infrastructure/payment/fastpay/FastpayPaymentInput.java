@@ -18,12 +18,12 @@ public class FastpayPaymentInput {
     private String referenceCode;
     private BigDecimal totalAmount;
     private String method;
-    private String CreditCard;
+    private String creditCardId;
     private String fullName;
     private String document;
     private String phone;
-    private String adressLine1;
-    private String adressLine2;
+    private String addressLine1;
+    private String addressLine2;
     private String zipCode;
     private String replyToUrl;
 
