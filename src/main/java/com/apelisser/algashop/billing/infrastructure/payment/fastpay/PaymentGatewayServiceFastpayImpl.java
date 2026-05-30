@@ -15,12 +15,12 @@ import java.util.UUID;
 
 @Service
 @ConditionalOnProperty(name = "algashop.integrations.payment.provider", havingValue = "FASTPAY")
-public class PaymentGatewayFastpayImpl implements PaymentGatewayService {
+public class PaymentGatewayServiceFastpayImpl implements PaymentGatewayService {
 
     private final FastpayPaymentAPIClient fastpayPaymentAPIClient;
     private final CreditCardRepository creditCardRepository;
 
-    public PaymentGatewayFastpayImpl(FastpayPaymentAPIClient fastpayPaymentAPIClient,
+    public PaymentGatewayServiceFastpayImpl(FastpayPaymentAPIClient fastpayPaymentAPIClient,
             CreditCardRepository creditCardRepository) {
         this.fastpayPaymentAPIClient = fastpayPaymentAPIClient;
         this.creditCardRepository = creditCardRepository;
