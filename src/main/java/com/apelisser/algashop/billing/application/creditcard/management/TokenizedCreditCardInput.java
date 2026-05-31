@@ -15,7 +15,6 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class TokenizedCreditCardInput {
 
-    @NotNull
     private UUID customerId;
 
     @NotBlank

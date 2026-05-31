@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -88,7 +89,7 @@ public class InvoiceManagementApplicationService {
             .build();
     }
 
-    private Set<LineItem> convertToLineItem(Set<LineItemInput> itemsInput) {
+    private Set<LineItem> convertToLineItem(List<LineItemInput> itemsInput) {
         Set<LineItem> lineItems = new LinkedHashSet<>();
 
         int itemNumber = 1;
