@@ -8,6 +8,7 @@ import com.apelisser.algashop.billing.domail.model.invoice.Payer;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.Payment;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentGatewayService;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentRequest;
+import com.apelisser.algashop.billing.infrastructure.payment.AlgashopPaymentProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,13 @@ public class PaymentGatewayServiceFastpayImpl implements PaymentGatewayService {
 
     private final FastpayPaymentAPIClient fastpayPaymentAPIClient;
     private final CreditCardRepository creditCardRepository;
+    private final AlgashopPaymentProperties algashopPaymentProperties;
 
     public PaymentGatewayServiceFastpayImpl(FastpayPaymentAPIClient fastpayPaymentAPIClient,
-            CreditCardRepository creditCardRepository) {
+            CreditCardRepository creditCardRepository, AlgashopPaymentProperties algashopPaymentProperties) {
         this.fastpayPaymentAPIClient = fastpayPaymentAPIClient;
         this.creditCardRepository = creditCardRepository;
+        this.algashopPaymentProperties = algashopPaymentProperties;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class PaymentGatewayServiceFastpayImpl implements PaymentGatewayService {
             .zipCode(address.getZipCode())
             .addressLine1(address.getStreet() + ", " + address.getNumber())
             .addressLine2(address.getComplement())
-            .replyToUrl("http://example.com/webhook");
+            .replyToUrl(algashopPaymentProperties.getFastpay().getWebhookUrl());
 
         switch (request.getMethod()) {
             case CREDIT_CARD -> {

@@ -12,6 +12,7 @@ import com.apelisser.algashop.billing.domail.model.invoice.Payer;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.Payment;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentGatewayService;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentRequest;
+import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,6 @@ public class InvoiceManagementApplicationService {
 
     @Transactional
     public void processPayment(UUID invoiceId) {
-
         Invoice invoice = invoiceRepository.findById(invoiceId).orElseThrow(InvoiceNotFoundException::new);
         PaymentRequest paymentRequest = toPaymentRequest(invoice);
 
@@ -76,6 +76,13 @@ public class InvoiceManagementApplicationService {
         }
 
         invoicingService.assignPayment(invoice, payment);
+        invoiceRepository.saveAndFlush(invoice);
+    }
+
+    @Transactional
+    public void updatePaymentStatus(UUID invoiceId, PaymentStatus paymentStatus) {
+        Invoice invoice = invoiceRepository.findById(invoiceId).orElseThrow(InvoiceNotFoundException::new);
+        invoice.updatePaymentStatus(paymentStatus);
         invoiceRepository.saveAndFlush(invoice);
     }
 

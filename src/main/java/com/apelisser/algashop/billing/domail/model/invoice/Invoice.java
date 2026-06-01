@@ -3,6 +3,7 @@ package com.apelisser.algashop.billing.domail.model.invoice;
 import com.apelisser.algashop.billing.domail.model.AbstractAuditableAggregateRoot;
 import com.apelisser.algashop.billing.domail.model.DomainException;
 import com.apelisser.algashop.billing.domail.model.IdGenerator;
+import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -184,6 +185,14 @@ public class Invoice extends AbstractAuditableAggregateRoot<Invoice> {
         PaymentSettings paymentSettings = PaymentSettings.brandNew(method, creditCardId);
         paymentSettings.setInvoice(this);
         this.setPaymentSettings(paymentSettings);
+    }
+
+    public void updatePaymentStatus(PaymentStatus status) {
+        switch (status) {
+            case FAILED -> cancel("Payment failed");
+            case REFUNDED -> cancel("Payment refunded");
+            case PAID -> markAsPaid();
+        }
     }
 
 }
