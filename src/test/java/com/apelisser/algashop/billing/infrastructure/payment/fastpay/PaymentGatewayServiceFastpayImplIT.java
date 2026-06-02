@@ -9,6 +9,8 @@ import com.apelisser.algashop.billing.domail.model.invoice.payment.Payment;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentRequest;
 import com.apelisser.algashop.billing.infrastructure.AbstractFastpayIT;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +28,16 @@ class PaymentGatewayServiceFastpayImplIT extends AbstractFastpayIT {
 
     @Autowired
     CreditCardRepository creditCardRepository;
+
+    @BeforeAll
+    public static void setUpAll() {
+        startWireMock();
+    }
+
+    @AfterAll
+    public static void tearDownAll() {
+        stopWireMock();
+    }
 
     @Test
     void shouldProcessPaymentWithCreditCard() {
