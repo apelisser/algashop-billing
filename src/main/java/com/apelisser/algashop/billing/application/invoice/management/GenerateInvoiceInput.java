@@ -1,5 +1,8 @@
 package com.apelisser.algashop.billing.application.invoice.management;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -7,7 +10,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -18,9 +20,21 @@ import java.util.UUID;
 public class GenerateInvoiceInput {
 
     private String orderId;
+
+    @NotNull
     private UUID customerId;
+
+    @Valid
+    @NotNull
     private PaymentSettingsInput paymentSettings;
+
+    @Valid
+    @NotNull
     private PayerData payer;
+
+    @Valid
+    @NotNull
+    @NotEmpty
     private List<LineItemInput> items;
 
     public GenerateInvoiceInput() {

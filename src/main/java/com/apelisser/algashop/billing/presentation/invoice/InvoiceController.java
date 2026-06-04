@@ -1,9 +1,11 @@
-package com.apelisser.algashop.billing.presentation;
+package com.apelisser.algashop.billing.presentation.invoice;
 
 import com.apelisser.algashop.billing.application.invoice.management.GenerateInvoiceInput;
 import com.apelisser.algashop.billing.application.invoice.management.InvoiceManagementApplicationService;
 import com.apelisser.algashop.billing.application.invoice.query.InvoiceOutput;
 import com.apelisser.algashop.billing.application.invoice.query.InvoiceQueryService;
+import com.apelisser.algashop.billing.domail.model.creditcard.CreditCardNotFoundException;
+import com.apelisser.algashop.billing.presentation.UnprocessableEntityException;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,13 @@ public class InvoiceController {
     @ResponseStatus(HttpStatus.CREATED)
     public InvoiceOutput generate(@PathVariable String orderId, @Valid @RequestBody GenerateInvoiceInput input) {
         input.setOrderId(orderId);
-        UUID invoiceId = invoiceManagementApplicationService.generate(input);
+
+        UUID invoiceId;
+        try {
+            invoiceId = invoiceManagementApplicationService.generate(input);
+        } catch (CreditCardNotFoundException e) {
+            throw new UnprocessableEntityException(e.getMessage(), e);
+        }
 
         try {
             invoiceManagementApplicationService.processPayment(invoiceId);

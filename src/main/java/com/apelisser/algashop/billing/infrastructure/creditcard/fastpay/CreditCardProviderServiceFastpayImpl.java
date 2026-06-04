@@ -2,10 +2,16 @@ package com.apelisser.algashop.billing.infrastructure.creditcard.fastpay;
 
 import com.apelisser.algashop.billing.domail.model.creditcard.CreditCardProviderService;
 import com.apelisser.algashop.billing.domail.model.creditcard.LimitedCreditCard;
+import com.apelisser.algashop.billing.presentation.BadGatewayException;
+import com.apelisser.algashop.billing.presentation.GatewayTimeoutException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
+import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +32,12 @@ public class CreditCardProviderServiceFastpayImpl implements CreditCardProviderS
             .customerCode(customerId.toString())
             .build();
 
-        FastpayCreditCardResponse response = fastpayCreditCardAPIClient.create(input);
+        FastpayCreditCardResponse response;
+        try {
+            response = fastpayCreditCardAPIClient.create(input);
+        } catch (ResourceAccessException e) {
+            throw mapIoException(e);
+        }
 
         return toLimitedCreditCard(response);
     }
@@ -39,6 +50,8 @@ public class CreditCardProviderServiceFastpayImpl implements CreditCardProviderS
             response = fastpayCreditCardAPIClient.findById(gatewayCode);
         } catch (HttpClientErrorException.NotFound e) {
             return Optional.empty();
+        } catch (ResourceAccessException e) {
+            throw mapIoException(e);
         }
 
         return Optional.of(toLimitedCreditCard(response));
@@ -46,7 +59,11 @@ public class CreditCardProviderServiceFastpayImpl implements CreditCardProviderS
 
     @Override
     public void delete(String gatewayCode) {
-        fastpayCreditCardAPIClient.delete(gatewayCode);
+        try {
+            fastpayCreditCardAPIClient.delete(gatewayCode);
+        } catch (ResourceAccessException e) {
+            throw mapIoException(e);
+        }
     }
 
     private LimitedCreditCard toLimitedCreditCard(FastpayCreditCardResponse response) {
@@ -57,6 +74,16 @@ public class CreditCardProviderServiceFastpayImpl implements CreditCardProviderS
             .expYear(response.getExpYear())
             .brand(response.getBrand())
             .build();
+    }
+
+    private RuntimeException mapIoException(ResourceAccessException e) {
+        Throwable root = NestedExceptionUtils.getMostSpecificCause(e);
+
+        if (root instanceof HttpTimeoutException || root instanceof SocketTimeoutException) {
+            throw new GatewayTimeoutException("Fastpay API timeout", e);
+        }
+
+        throw new BadGatewayException("Unable to connect to Fastpay API", e);
     }
 
 }

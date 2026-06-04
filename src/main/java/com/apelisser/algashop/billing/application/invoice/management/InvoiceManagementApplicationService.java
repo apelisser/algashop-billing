@@ -61,9 +61,11 @@ public class InvoiceManagementApplicationService {
 
     @Transactional
     public void processPayment(UUID invoiceId) {
-        Invoice invoice = invoiceRepository.findById(invoiceId).orElseThrow(InvoiceNotFoundException::new);
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+            .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
         PaymentRequest paymentRequest = toPaymentRequest(invoice);
 
+        log.info("Processing payment for invoice {}", invoiceId);
         Payment payment;
         try {
             payment = paymentGatewayService.capture(paymentRequest);
@@ -81,7 +83,10 @@ public class InvoiceManagementApplicationService {
 
     @Transactional
     public void updatePaymentStatus(UUID invoiceId, PaymentStatus paymentStatus) {
-        Invoice invoice = invoiceRepository.findById(invoiceId).orElseThrow(InvoiceNotFoundException::new);
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+            .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
+
+        log.info("Updating payment status for invoice {} to {}", invoiceId, paymentStatus);
         invoice.updatePaymentStatus(paymentStatus);
         invoiceRepository.saveAndFlush(invoice);
     }

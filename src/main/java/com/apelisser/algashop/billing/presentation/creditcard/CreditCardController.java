@@ -1,4 +1,4 @@
-package com.apelisser.algashop.billing.presentation;
+package com.apelisser.algashop.billing.presentation.creditcard;
 
 import com.apelisser.algashop.billing.application.creditcard.management.CreditCardManagementService;
 import com.apelisser.algashop.billing.application.creditcard.management.TokenizedCreditCardInput;

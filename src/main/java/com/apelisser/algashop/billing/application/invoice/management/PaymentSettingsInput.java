@@ -1,6 +1,7 @@
 package com.apelisser.algashop.billing.application.invoice.management;
 
 import com.apelisser.algashop.billing.domail.model.invoice.PaymentMethod;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +17,9 @@ import java.util.UUID;
 @Builder
 public class PaymentSettingsInput {
 
+    @NotNull
     private PaymentMethod method;
+
     private UUID creditCardId;
 
     public PaymentSettingsInput() {
