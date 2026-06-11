@@ -9,9 +9,15 @@ import com.apelisser.algashop.billing.domail.model.invoice.payment.Payment;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentGatewayService;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentRequest;
 import com.apelisser.algashop.billing.infrastructure.payment.AlgashopPaymentProperties;
+import com.apelisser.algashop.billing.presentation.BadGatewayException;
+import com.apelisser.algashop.billing.presentation.GatewayTimeoutException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
+import java.net.SocketTimeoutException;
+import java.net.http.HttpTimeoutException;
 import java.util.UUID;
 
 @Service
@@ -32,13 +38,26 @@ public class PaymentGatewayServiceFastpayImpl implements PaymentGatewayService {
     @Override
     public Payment capture(PaymentRequest request) {
         FastpayPaymentInput input = convertToInput(request);
-        FastpayPaymentModel response = fastpayPaymentAPIClient.capture(input);
+
+        FastpayPaymentModel response;
+        try {
+            response = fastpayPaymentAPIClient.capture(input);
+        } catch (ResourceAccessException e) {
+            throw mapIoException(e);
+        }
+
         return convertToPayment(response);
     }
 
     @Override
     public Payment findByCode(String gatewayCode) {
-        FastpayPaymentModel response = fastpayPaymentAPIClient.findById(gatewayCode);
+        FastpayPaymentModel response;
+        try {
+            response = fastpayPaymentAPIClient.findById(gatewayCode);
+        } catch (ResourceAccessException e) {
+            throw mapIoException(e);
+        }
+
         return convertToPayment(response);
     }
 
@@ -93,6 +112,16 @@ public class PaymentGatewayServiceFastpayImpl implements PaymentGatewayService {
         builder.status(FastpayEnumConverter.convert(fastpayPaymentStatus));
 
         return builder.build();
+    }
+
+    private RuntimeException mapIoException(ResourceAccessException e) {
+        Throwable root = NestedExceptionUtils.getMostSpecificCause(e);
+
+        if (root instanceof HttpTimeoutException || root instanceof SocketTimeoutException) {
+            throw new GatewayTimeoutException("Fastpay API timeout", e);
+        }
+
+        throw new BadGatewayException("Unable to connect to Fastpay API", e);
     }
 
 }

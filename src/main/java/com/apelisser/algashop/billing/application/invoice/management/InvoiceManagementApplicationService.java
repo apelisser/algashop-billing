@@ -9,6 +9,7 @@ import com.apelisser.algashop.billing.domail.model.invoice.InvoiceRepository;
 import com.apelisser.algashop.billing.domail.model.invoice.InvoicingService;
 import com.apelisser.algashop.billing.domail.model.invoice.LineItem;
 import com.apelisser.algashop.billing.domail.model.invoice.Payer;
+import com.apelisser.algashop.billing.domail.model.invoice.PaymentMethod;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.Payment;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentGatewayService;
 import com.apelisser.algashop.billing.domail.model.invoice.payment.PaymentRequest;
@@ -45,6 +46,14 @@ public class InvoiceManagementApplicationService {
     @Transactional
     public UUID generate(GenerateInvoiceInput input) {
         PaymentSettingsInput paymentSettings = input.getPaymentSettings();
+
+        if (paymentSettings.getMethod() == PaymentMethod.CREDIT_CARD) {
+            UUID creditCardId = input.getPaymentSettings().getCreditCardId();
+            UUID customerId = input.getCustomerId();
+            if (!creditCardRepository.existsByIdAndCustomerId(creditCardId, customerId)) {
+                throw new CreditCardNotFoundException(creditCardId);
+            }
+        }
 
         verifyCreditCardId(paymentSettings.getCreditCardId());
 
