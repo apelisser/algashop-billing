@@ -1,0 +1,20 @@
+package com.apelisser.algashop.billing.utils;
+
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Bean;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+@TestConfiguration
+public class TestcontainerPostgreSqlConfig {
+
+    private static final PostgreSQLContainer postgreSQLContainer =
+        new PostgreSQLContainer("postgres:17-alpine").withDatabaseName("billing_test");
+
+    @Bean
+    @ServiceConnection
+    public PostgreSQLContainer postgreSQLContainer() {
+        return postgreSQLContainer;
+    }
+
+}

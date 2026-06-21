@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 @Import(FastpayCreditCardTokenizationAPIClientConfig.class)
-public abstract class AbstractFastpayIT {
+public abstract class AbstractFastpayIT extends AbstractInfrastructureIT {
 
     @Autowired
     protected CreditCardProviderServiceFastpayImpl creditCardProvider;
